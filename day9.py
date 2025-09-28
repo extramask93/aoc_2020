@@ -14,17 +14,24 @@ def find_first_invalid_number(numbers:List[int],*,preamble_len=25) -> int | None
         if not is_sum_of_previous(numbers[i], numbers[i-preamble_len:i]):
             return numbers[i]
     return None
-
-def find_contiguous_sum(number, numbers) -> List[int] | None:
-    for i in range(0, len(numbers)):
-        summ = numbers[i]
-        j = i+1
-        while summ < number:
-            summ += numbers[j]
-            if summ == number:
-                return numbers[i:j+1]
-            j +=1
-    return None   
+#rework this to sliding window
+def find_contiguous_sum_window(number, numbers) -> List[int] | None:
+    window_start_idx = 0
+    window_end_idx = 1
+    window_sum = numbers[window_start_idx]
+    while window_end_idx <= len(numbers):
+        if window_sum < number and window_end_idx < len(numbers):
+            window_sum += numbers[window_end_idx]
+            window_end_idx +=1
+            # extend right
+        elif window_sum > number:
+            window_sum -= numbers[window_start_idx]
+            window_start_idx +=1
+        elif window_sum == number and window_end_idx - window_start_idx > 1:
+            return numbers[window_start_idx:window_end_idx]
+        else:
+            break
+    return None
 
 
 if __name__ == "__main__":
@@ -32,7 +39,7 @@ if __name__ == "__main__":
         numbers = [int(line) for line in f]
     first = find_first_invalid_number(numbers)
     print(first)
-    consecutives = find_contiguous_sum(first,numbers)
+    consecutives = find_contiguous_sum_window(first,numbers)
     mi = min(consecutives)
     mx = max(consecutives)
     print(mi+mx)
